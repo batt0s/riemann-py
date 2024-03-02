@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Riemann Toplamı</title>
+</head>
+
+<body>
+    <form id="form" class="container" method="get">
+        <label for="f">Fonksiyon</label>
+        <input type="text" id="f" name="f" placeholder="sin(x^3)" required>
+        <label>Aralık: </label>
+        <label for="a">a</label>
+        <input type="text" id="a" name="a" placeholder="-10" required>
+        <label for="b">b</label>
+        <input type="text" id="b" name="b" placeholder="10" required>
+        <label for="N">Bölüntü Sayısı</label>
+        <input type="text" id="N" name="N" placeholder="20" required>
+        <input type="submit" id="get_riemann" value="Hesapla">
+    </form>
+    
+    {% if alt_url or ust_url %}
+    <div class="container">
+        {% if alt_url %}
+        <img src="{{ alt_url }}" alt="alt toplam">
+        {% endif %}
+        
+        {% if ust_url %}
+        <img src="{{ ust_url }}" alt="üst toplam">
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <style>
+    .container {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    </style>
+</body>
+
+</html>
