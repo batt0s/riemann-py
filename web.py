@@ -8,7 +8,7 @@ Created on Sat Mar  2 18:26:18 2024
 from flask import Flask
 from flask import render_template, request, jsonify
 from uuid import uuid4
-from integral import riemann_alt_gorsel, riemann_ust_gorsel
+from integral import riemann_alt_gorsel, riemann_ust_gorsel, str_to_float
 
 app = Flask("riemann", static_folder="img/")
 
@@ -26,7 +26,7 @@ def index():
     if None in [f, a, b, N]:
         return render_template("index.html")
     
-    a, b, N = int(a), int(b), int(N)
+    a, b, N = str_to_float(a), str_to_float(b), int(N)
 
     id = uuid4()
     

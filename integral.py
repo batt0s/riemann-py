@@ -10,6 +10,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 from sympy import sympify, lambdify, integrate
 
+def str_to_float(n: str) -> float:
+    return float(sympify(n))
 
 def get_max(f, x: float, width: float = 1):
     X = np.linspace(x, x+width)
