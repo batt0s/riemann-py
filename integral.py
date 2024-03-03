@@ -10,9 +10,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 from sympy import sympify, lambdify, integrate
 
-def str_to_float(n: str) -> float:
-    return float(sympify(n))
-
 def get_max(f, x: float, width: float = 1):
     X = np.linspace(x, x+width)
     return np.max(f(X))
@@ -21,12 +18,18 @@ def get_min(f, x: float, width: float = 1):
     X = np.linspace(x, x+width)
     return np.min(f(X))
 
-def riemann_alt_gorsel(f: str, a: float, b: float, N: int,
+def riemann_alt_gorsel(f: str, a: str, b: str, N: int,
                        output_path: str = "riemann_alt.png") -> str:
     # Fonksiyon
     f_str = f
     f_sym = sympify(f_str)
     f = lambdify("x", f_sym)
+    
+    # Sınırlar
+    a_sym = sympify(a)
+    a = float(a_sym)
+    b_sym = sympify(b)
+    b = float(b_sym)
     
     # Hesaplamalar için x ve y değerleri
     x = np.linspace(a, b, N+1) # a'dan b'ye değerler, N+1 eşit parça
@@ -55,7 +58,7 @@ def riemann_alt_gorsel(f: str, a: float, b: float, N: int,
     ax.spines['right'].set_color('none')
     
     deger = np.sum(y_alt * dx)
-    gercek_deger = integrate(f_sym, ("x", a, b))
+    gercek_deger = integrate(f_sym, ("x", a_sym, b_sym))
 
     plt.title(f"Riemann Alt Toplamı, f(x)={f_sym}")
     txt=f"a={a}, b={b} N={N}, dx={dx}\nToplam = {deger}, Gerçek değer = {gercek_deger}"
@@ -65,12 +68,18 @@ def riemann_alt_gorsel(f: str, a: float, b: float, N: int,
     
     return output_path
 
-def riemann_ust_gorsel(f: str, a: float, b: float, N: int,
+def riemann_ust_gorsel(f: str, a: str, b: str, N: int,
                        output_path: str = "riemann_ust.png") -> str:
     # Fonksiyon
     f_str = f
     f_sym = sympify(f_str)
     f = lambdify("x", f_sym)
+    
+    # Sınırlar
+    a_sym = sympify(a)
+    a = float(a_sym)
+    b_sym = sympify(b)
+    b = float(b_sym)
     
     # Hesaplamalar için x ve y değerleri
     x = np.linspace(a, b, N+1) # a'dan b'ye değerler, N+1 eşit parça
@@ -99,7 +108,7 @@ def riemann_ust_gorsel(f: str, a: float, b: float, N: int,
     ax.spines['right'].set_color('none')
 
     deger = np.sum(y_ust * dx)
-    gercek_deger = integrate(f_sym, ("x", a, b))
+    gercek_deger = integrate(f_sym, ("x", a_sym, b_sym))
 
     plt.title(f"Riemann Üst Toplamı, f(x)={f_sym}")
     txt=f"a={a}, b={b}, N={N}, dx={dx}\nToplam = {deger}, Gerçek değer = {gercek_deger}"

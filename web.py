@@ -6,9 +6,9 @@ Created on Sat Mar  2 18:26:18 2024
 """
 
 from flask import Flask
-from flask import render_template, request, jsonify
+from flask import render_template, request
 from uuid import uuid4
-from integral import riemann_alt_gorsel, riemann_ust_gorsel, str_to_float
+from integral import riemann_alt_gorsel, riemann_ust_gorsel
 
 app = Flask("riemann", static_folder="img/")
 
@@ -16,17 +16,15 @@ app = Flask("riemann", static_folder="img/")
 def index():
     if request.method != "GET":
         return "Method Not Allowed", 405
-    args = request.args
     
+    args = request.args
     f = args.get("f", None)
     a = args.get("a", None)
     b = args.get("b", None)
     N = args.get("N", None)
-
     if None in [f, a, b, N]:
         return render_template("index.html")
-    
-    a, b, N = str_to_float(a), str_to_float(b), int(N)
+    N = int(N)
 
     id = uuid4()
     
