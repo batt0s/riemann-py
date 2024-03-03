@@ -1,4 +1,3 @@
 *.png
 __pycache__/
-integral0.py
-calculate_integral0.py
+*0.py
