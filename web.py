@@ -8,7 +8,7 @@ Created on Sat Mar  2 18:26:18 2024
 from flask import Flask
 from flask import render_template, request
 from uuid import uuid4
-from integral import riemann_alt_gorsel, riemann_ust_gorsel
+from integral import riemann_alt_gorsel, riemann_ust_gorsel, NotInDomainError
 
 app = Flask("riemann", static_folder="img/")
 
@@ -28,8 +28,12 @@ def index():
 
     id = uuid4()
     
-    alt_path = riemann_alt_gorsel(f, a, b, N, f"img/alt_{id}.png")
-    ust_path = riemann_ust_gorsel(f, a, b, N, f"img/ust_{id}.png")
+    try:
+        alt_path = riemann_alt_gorsel(f, a, b, N, f"img/alt_{id}.png")
+        ust_path = riemann_ust_gorsel(f, a, b, N, f"img/ust_{id}.png")
+    except NotInDomainError:
+        return render_template("index.html",
+                               error="Verilen fonksiyon verilen aralıkta tanımlı değil.")
     
     hostname = request.host_url
     alt_url = hostname + alt_path

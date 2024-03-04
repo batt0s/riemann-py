@@ -5,13 +5,15 @@
 </head>
 
 <body>
+    <h1> Riemann Toplamı Hesaplama ve Görselleştirme Aracı </h1>
+    <p> Alttaki formdan değerleri girip 'Hesapla'ya basınız.</p>
     <form id="form" class="container" method="get">
         <label for="f">Fonksiyon</label>
         <input type="text" id="f" name="f" placeholder="sin(x^3)" required>
         <label>Aralık: </label>
-        <label for="a">a</label>
+        <label for="a">a:</label>
         <input type="text" id="a" name="a" placeholder="-10" required>
-        <label for="b">b</label>
+        <label for="b">b:</label>
         <input type="text" id="b" name="b" placeholder="10" required>
         <label for="N">Bölüntü Sayısı</label>
         <input type="text" id="N" name="N" placeholder="20" required>
@@ -30,6 +32,13 @@
     </div>
     {% endif %}
     
+    {% if error %}
+    <div>
+        <h3>Hata:</h3>
+        <p>{{error}}</p>
+    </div>
+    {% endif %}
+    
     <style>
     .container {
         display: flex;
@@ -37,6 +46,17 @@
         align-items: center;
     }
     </style>
+    
+    <script>
+    window.onload = function() {
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        document.getElementById('f').value = urlParams.get('f');
+        document.getElementById('a').value = urlParams.get('a');
+        document.getElementById('b').value = urlParams.get('b');
+        document.getElementById('N').value = urlParams.get('N');
+    };
+    </script>
 </body>
 
 </html>
