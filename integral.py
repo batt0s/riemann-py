@@ -2,24 +2,22 @@
 """
 Created on Sat Mar  2 18:01:20 2024
 
-@author: kerem (batt0s)
+@author: kerem (kerem.ullen@pm.me)
+
+TODO:
+    - [ ] Fonksiyonun integrallenebilirliğini kontrol et
+    
 """
 
 # Imports
 import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
-from sympy import sympify, lambdify, integrate, Symbol, S, Interval
-from sympy.calculus.util import continuous_domain
+from sympy import sympify, lambdify, integrate, Symbol, SympifyError
 
 
 # İnteraktif olmayan backend (https://matplotlib.org/stable/users/explain/backends.html)
 matplotlib.use('agg')
-
-
-# Daha sonra kullanmak üzere aralık tanıml aralığında değil hatası
-class NotInDomainError(ValueError):
-    pass
 
 
 # Fonksiyonun aralıktaki max ve minimum değerini bulmak için fonksiyonlar.
@@ -41,19 +39,41 @@ def riemann_alt_gorsel(f: str, a: str, b: str, N: int,
     
     # Fonksiyon
     f_str = f
-    f_sym = sympify(f_str)
+    try:
+        f_sym = sympify(f_str)
+    except SympifyError:
+        raise SyntaxError(f"Girilen ifade {f} anlaşılmadı")
+    if f_sym.is_number:
+        raise SyntaxError(f"Girilen ifade {f} bir fonksiyon belirtmiyor")
     f = lambdify(x_sym, f_sym)
     
     # Sınırlar
-    a_sym = sympify(a)
+    try:
+        a_sym = sympify(a)
+    except SympifyError:
+        raise SyntaxError(f"Verilen ifade {a} anlaşılmadı")
+    if not a_sym.is_number:
+        raise ValueError(f"Sınır değeri {a_sym} bir sayı değil")
+    if not a_sym.is_real:
+        raise ValueError(f"Sınır değeri {a_sym} bir gerçel sayı değil")
     a = float(a_sym)
-    b_sym = sympify(b)
+    
+    try:
+        b_sym = sympify(b)
+    except SympifyError:
+        raise SyntaxError(f"Verilen ifade {b} anlaşılmadı")
+    if not b_sym.is_number:
+        raise ValueError(f"Sınır değeri {b_sym} bir sayı değil")
+    if not b_sym.is_real:
+        raise ValueError(f"Sınır değeri {b_sym} bir gerçel sayı değil")
     b = float(b_sym)
     
-    # Verilen sınırlar verilen fonksiyonun tanımlı olduğu aralıkta
+    # ! Sürekli olmayıp integrallenebilir ve sürekli olup integrallenebilen 
+    # fonksiyonlar var.
+    # Verilen sınırlar verilen fonksiyonun sürekli olduğu aralıkta
     # değilse hata döndür. (reel sayılar üstünde)
-    if not Interval(a_sym, b_sym).is_subset(continuous_domain(f_sym, x_sym, S.Reals)):
-        raise NotInDomainError
+    # if not Interval(a_sym, b_sym).is_subset(continuous_domain(f_sym, x_sym, S.Reals)):
+    #     raise NotIntegrableError
     
     # Hesaplamalar için x ve y değerleri
     x = np.linspace(a, b, N+1) # a'dan b'ye değerler, N+1 eşit parça
@@ -63,6 +83,11 @@ def riemann_alt_gorsel(f: str, a: str, b: str, N: int,
     # oluşsun.
     X = np.linspace(a, b, 10*N+1)
     Y = f(X)
+    
+    # Y değerleri arasında NaN varsa hata döndür. Genelde tanımsız olduğu
+    # zaman nan döner. Sonsuzda da olabilir.
+    if np.isnan(Y).any():
+        raise ValueError("Fonksiyon verilen aralıkta tanımsız")
     
     dx = (b-a)/N
     
@@ -113,19 +138,41 @@ def riemann_ust_gorsel(f: str, a: str, b: str, N: int,
     
     # Fonksiyon
     f_str = f
-    f_sym = sympify(f_str)
+    try:
+        f_sym = sympify(f_str)
+    except SympifyError:
+        raise SyntaxError(f"Girilen ifade {f} anlaşılmadı")
+    if f_sym.is_number:
+        raise SyntaxError(f"Girilen ifade {f} bir fonksiyon belirtmiyor")
     f = lambdify(x_sym, f_sym)
     
     # Sınırlar
-    a_sym = sympify(a)
+    try:
+        a_sym = sympify(a)
+    except SympifyError:
+        raise SyntaxError(f"Verilen ifade {a} anlaşılmadı")
+    if not a_sym.is_number:
+        raise ValueError(f"Sınır değeri {a_sym} bir sayı değil")
+    if not a_sym.is_real:
+        raise ValueError(f"Sınır değeri {a_sym} bir gerçel sayı değil")
     a = float(a_sym)
-    b_sym = sympify(b)
+    
+    try:
+        b_sym = sympify(b)
+    except SympifyError:
+        raise SyntaxError(f"Verilen ifade {b} anlaşılmadı")
+    if not b_sym.is_number:
+        raise ValueError(f"Sınır değeri {b_sym} bir sayı değil")
+    if not b_sym.is_real:
+        raise ValueError(f"Sınır değeri {b_sym} bir gerçel sayı değil")
     b = float(b_sym)
     
+    # ! Sürekli olmayıp integrallenebilir ve sürekli olup integrallenebilen 
+    # fonksiyonlar var.
     # Verilen sınırlar verilen fonksiyonun tanımlı olduğu aralıkta
     # değilse hata döndür. (reel sayılar üstünde)
-    if not Interval(a_sym, b_sym).is_subset(continuous_domain(f_sym, x_sym, S.Reals)):
-        raise NotInDomainError
+    # if not Interval(a_sym, b_sym).is_subset(continuous_domain(f_sym, x_sym, S.Reals)):
+    #     raise NotIntegrableError
     
     # Hesaplamalar için x ve y değerleri
     x = np.linspace(a, b, N+1) # a'dan b'ye değerler, N+1 eşit parça
@@ -133,7 +180,12 @@ def riemann_ust_gorsel(f: str, a: str, b: str, N: int,
     # Fonksiyon çizimi için x ve y değerleri
     X = np.linspace(a, b, 10*N+1)
     Y = f(X)
-        
+    
+    # Y değerleri arasında NaN varsa hata döndür. Genelde tanımsız olduğu
+    # zaman nan döner. Sonsuzda da olabilir.
+    if np.isnan(Y).any():
+        raise ValueError("Fonksiyon verilen aralıkta tanımsız")
+
     dx = (b-a)/N
     
     plt.figure(figsize=(6,6))

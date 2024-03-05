@@ -2,13 +2,13 @@
 """
 Created on Sat Mar  2 18:26:18 2024
 
-@author: kerem (batt0s)
+@author: kerem (kerem.ullen@pm.me)
 """
 
 from flask import Flask
 from flask import render_template, request
 from uuid import uuid4
-from integral import riemann_alt_gorsel, riemann_ust_gorsel, NotInDomainError
+from integral import riemann_alt_gorsel, riemann_ust_gorsel
 
 app = Flask("riemann", static_folder="img/")
 
@@ -31,9 +31,8 @@ def index():
     try:
         alt_path = riemann_alt_gorsel(f, a, b, N, f"img/alt_{id}.png")
         ust_path = riemann_ust_gorsel(f, a, b, N, f"img/ust_{id}.png")
-    except NotInDomainError:
-        return render_template("index.html",
-                               error="Verilen fonksiyon verilen aralıkta tanımlı değil.")
+    except Exception as err:
+        return render_template("index.html", error=str(err))
     
     hostname = request.host_url
     alt_url = hostname + alt_path
