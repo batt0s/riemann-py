@@ -13,7 +13,7 @@ TODO:
 import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
-from sympy import sympify, lambdify, integrate, Symbol, SympifyError
+from sympy import sympify, lambdify, integrate, Symbol, SympifyError, Piecewise
 
 
 # İnteraktif olmayan backend (https://matplotlib.org/stable/users/explain/backends.html)
@@ -94,8 +94,14 @@ def riemann_alt_gorsel(f: str, a: str, b: str, N: int,
     # Grafiği çizeceğimiz alanı figsize boyunda oluşturuyoruz
     plt.figure(figsize=(6,6))
 
-    # X ve Y değerleri ile fonksiyonu çiziyoruz
-    plt.plot(X, Y, 'r')
+    # X ve Y değerleri ile fonksiyonu çiziyoruz.
+    # Fonksiyon parçalı değilse noktaların arasını doldurarak çiziyoruz.
+    # Eğer fonksiyon parçalı ise sadece verilen noktaları çiziyoruz.
+    # Bu kontrolü koymazsak kritik noktalar çizimde belli olmaz.
+    if type(f_sym) == Piecewise:
+        plt.plot(X, Y, 'r.', markersize=3)
+    else:
+        plt.plot(X, Y, 'r')
     
     # alt toplam hesaplarken kullanacağımız x ve y değerleri
     x_alt = x[:-1]
@@ -121,10 +127,10 @@ def riemann_alt_gorsel(f: str, a: str, b: str, N: int,
     # topluyoruz yani aslında dikdörtgenlerin alanlarını bulup topluyoruz.
     deger = np.sum(y_alt * dx)
     # sympy ile integralin gerçek değerini hesaplıyoruz.
-    gercek_deger = integrate(f_sym, (x_sym, a_sym, b_sym))
+    gercek_deger = integrate(f_sym, (x_sym, a_sym, b_sym)).evalf()
 
     plt.title(f"Riemann Alt Toplamı, f(x)={f_sym}")
-    txt=f"a={a}, b={b} N={N}, dx={dx}\nToplam = {deger:.4f}, Gerçek değer = {gercek_deger}"
+    txt=f"a={a}, b={b} N={N}, dx={dx}\nToplam = {deger:.4f}, Gerçek değer = {gercek_deger:.4f}"
     plt.figtext(0.5, 0.01, txt, wrap=True, horizontalalignment='center', fontsize=12)
     
     plt.savefig(output_path, bbox_inches='tight')
@@ -190,7 +196,14 @@ def riemann_ust_gorsel(f: str, a: str, b: str, N: int,
     
     plt.figure(figsize=(6,6))
     
-    plt.plot(X, Y, 'r')
+    # X ve Y değerleri ile fonksiyonu çiziyoruz.
+    # Fonksiyon parçalı değilse noktaların arasını doldurarak çiziyoruz.
+    # Eğer fonksiyon parçalı ise sadece verilen noktaları çiziyoruz.
+    # Bu kontrolü koymazsak kritik noktalar çizimde belli olmaz.
+    if type(f_sym) == Piecewise:
+        plt.plot(X, Y, 'r.', markersize=3)
+    else:
+        plt.plot(X, Y, 'r')
     
     x_ust = x[:-1]
     y_ust= np.zeros(len(x_ust))
@@ -206,10 +219,10 @@ def riemann_ust_gorsel(f: str, a: str, b: str, N: int,
     ax.spines['right'].set_color('none')
 
     deger = np.sum(y_ust * dx)
-    gercek_deger = integrate(f_sym, (x_sym, a_sym, b_sym))
+    gercek_deger = integrate(f_sym, (x_sym, a_sym, b_sym)).evalf()
 
     plt.title(f"Riemann Üst Toplamı, f(x)={f_sym}")
-    txt=f"a={a}, b={b}, N={N}, dx={dx}\nToplam = {deger:.4f}, Gerçek değer = {gercek_deger}"
+    txt=f"a={a}, b={b}, N={N}, dx={dx}\nToplam = {deger:.4f}, Gerçek değer = {gercek_deger:.4f}"
     plt.figtext(0.5, 0.01, txt, wrap=True, horizontalalignment='center', fontsize=12)
     
     plt.savefig(output_path, bbox_inches='tight')
