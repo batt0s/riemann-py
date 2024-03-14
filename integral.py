@@ -30,6 +30,35 @@ def get_min(f, x: float, width: float = 1):
     X = np.linspace(x, x+width)
     return np.min(f(X))
 
+def riemann_alt(f, a, b, N):
+    x = np.linspace(a, b, N+1)[:-1]
+    y = np.zeros(len(x))
+    dx = (b-a)/N
+    for i, x_ in enumerate(x):
+        y[i] = get_min(f, x_, dx)
+    return np.sum(y * dx)
+
+def riemann_ust(f, a, b, N):
+    x = np.linspace(a, b, N+1)[:-1]
+    y = np.zeros(len(x))
+    dx = (b-a)/N
+    for i, x_ in enumerate(x):
+        y[i] = get_max(f, x_, dx)
+    return np.sum(y * dx)
+
+
+# Riemann integrallenebilir mi kontrolü
+# Fonksiyonun verilen aralıkta tanımlı olduğu zaten biliniyor
+# Ü(f, P) - A(f, P) parçalanma sayısı arttıkça 0a yaklaşmalı
+def check_riemann(f, a, b, N):
+    last = riemann_ust(f, a, b, N-1) - riemann_alt(f, a, b, N-1)
+    for n in range(N-1, 2*N):
+        val = riemann_ust(f, a, b, n+1) - riemann_alt(f, a, b, n+1)
+        if val > last:
+            return False
+        last = val
+    return True
+        
 
 # Görselleri hazırlamak için fonksiyonlar
 def riemann_alt_gorsel(f: str, a: str, b: str, N: int,
@@ -88,6 +117,11 @@ def riemann_alt_gorsel(f: str, a: str, b: str, N: int,
     # zaman nan döner. Sonsuzda da olabilir.
     if np.isnan(Y).any():
         raise ValueError("Fonksiyon verilen aralıkta tanımsız")
+        
+    # Fonksiyon verilen aralıkta tanımlıysa Riemann integrallenebilir mi
+    ok = check_riemann(f, a, b, N)
+    if not ok:
+        raise ValueError("Fonksiyon Riemann integrallenebilir değil")
     
     dx = (b-a)/N
     
@@ -191,6 +225,9 @@ def riemann_ust_gorsel(f: str, a: str, b: str, N: int,
     # zaman nan döner. Sonsuzda da olabilir.
     if np.isnan(Y).any():
         raise ValueError("Fonksiyon verilen aralıkta tanımsız")
+        
+    if not check_riemann(f, a, b, N):
+        raise ValueError("Fonksiyon Riemann integrallenebilir değil")
 
     dx = (b-a)/N
     
